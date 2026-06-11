@@ -10,52 +10,35 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+    // sortでorder順に並べる order:.reverseでorderの数字が大きい順に並べる
+    @Query(sort: \CheckListTemplate.order, order: .reverse) private var templates: [CheckListTemplate]
+    
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
+        // UIKitでいうUINavigationController
+        NavigationStack {
+            List(templates) { template in
+                Text(template.name)
             }
+            // barに表示されるタイトル
+            .navigationTitle("テンプレート一覧")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button{
+                        // テスト用のテンプレート追加
+                        let newTemplate = CheckListTemplate(name: "テスト", order: templates.count)
+                        modelContext.insert(newTemplate)
+                    } label: {
+                        // plusは＋アイコン
+                        Image(systemName: "plus")
                     }
                 }
             }
-        } detail: {
-            Text("Select an item")
         }
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
+    
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+
 }

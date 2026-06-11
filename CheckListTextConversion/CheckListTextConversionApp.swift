@@ -12,7 +12,9 @@ import SwiftData
 struct CheckListTextConversionApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            CheckListTemplate.self,
+            CheckListSection.self,
+            CheckListItem.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
